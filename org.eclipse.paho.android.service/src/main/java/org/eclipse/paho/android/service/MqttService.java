@@ -27,6 +27,7 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 import org.eclipse.paho.client.mqttv3.MqttSecurityException;
+import org.greenrobot.eventbus.EventBus;
 
 import android.annotation.SuppressLint;
 import android.app.Service;
@@ -284,6 +285,7 @@ public class MqttService extends Service implements MqttTraceHandler {
       callbackIntent.putExtras(dataBundle);
     }
     LocalBroadcastManager.getInstance(this).sendBroadcast(callbackIntent);
+
   }
 
   // The major API implementation follows :-

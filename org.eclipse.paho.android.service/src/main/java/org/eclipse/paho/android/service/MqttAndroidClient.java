@@ -125,7 +125,7 @@ public class MqttAndroidClient extends BroadcastReceiver implements
 	private final MyServiceConnection serviceConnection = new MyServiceConnection();
 
 	// The Android Service which will process our mqtt calls
-	private MqttService mqttService;
+	MqttService mqttService;
 
 	// An identifier for the underlying client connection, which we can pass to
 	// the service
@@ -153,7 +153,7 @@ public class MqttAndroidClient extends BroadcastReceiver implements
 	private final Ack messageAck;
 	private boolean traceEnabled = false;
 	
-	private volatile boolean receiverRegistered = false;
+	volatile boolean receiverRegistered = false;
 	private volatile boolean bindedService = false;
 
 	/**
@@ -294,7 +294,9 @@ public class MqttAndroidClient extends BroadcastReceiver implements
 			mqttService.close(clientHandle);
 		}
 	}
-	
+	public String getClientHandle(){
+		return this.clientHandle;
+	}
 	/**
 	 * Connects to an MQTT server using the default options.
 	 * <p>
@@ -444,7 +446,7 @@ public class MqttAndroidClient extends BroadcastReceiver implements
 		return token;
 	}
 
-	private void registerReceiver(BroadcastReceiver receiver) {
+	void registerReceiver(BroadcastReceiver receiver) {
 		IntentFilter filter = new IntentFilter();
 				filter.addAction(MqttServiceConstants.CALLBACK_TO_ACTIVITY);
 				LocalBroadcastManager.getInstance(myContext).registerReceiver(receiver, filter);
@@ -1432,7 +1434,7 @@ public class MqttAndroidClient extends BroadcastReceiver implements
 	 * 
 	 * @param data
 	 */
-	private void connectAction(Bundle data) {
+	void connectAction(Bundle data) {
 		IMqttToken token = connectToken;
 		removeMqttToken(data);
 		
@@ -1446,7 +1448,7 @@ public class MqttAndroidClient extends BroadcastReceiver implements
 	 * 
 	 * @param data
 	 */
-	private void disconnected(Bundle data) {
+	void disconnected(Bundle data) {
 		clientHandle = null; // avoid reuse!
 		IMqttToken token = removeMqttToken(data);
 		if (token != null) {
@@ -1462,7 +1464,7 @@ public class MqttAndroidClient extends BroadcastReceiver implements
 	 * 
 	 * @param data
 	 */
-	private void connectionLostAction(Bundle data) {
+	void connectionLostAction(Bundle data) {
 		if (callback != null) {
 			Exception reason = (Exception) data
 					.getSerializable(MqttServiceConstants.CALLBACK_EXCEPTION);
@@ -1470,7 +1472,7 @@ public class MqttAndroidClient extends BroadcastReceiver implements
 		}
 	}
 
-	private void connectExtendedAction(Bundle data){
+	void connectExtendedAction(Bundle data){
 		// This is called differently from a normal connect
 
 		if(callback instanceof MqttCallbackExtended){
@@ -1489,7 +1491,7 @@ public class MqttAndroidClient extends BroadcastReceiver implements
 	 * @param data
 	 *            the result data
 	 */
-	private void simpleAction(IMqttToken token, Bundle data) {
+	void simpleAction(IMqttToken token, Bundle data) {
 		if (token != null) {
 			Status status = (Status) data
 					.getSerializable(MqttServiceConstants.CALLBACK_STATUS);
@@ -1510,7 +1512,7 @@ public class MqttAndroidClient extends BroadcastReceiver implements
 	 * 
 	 * @param data
 	 */
-	private void sendAction(Bundle data) {
+	void sendAction(Bundle data) {
 		IMqttToken token = getMqttToken(data); // get, don't remove - will
 		// remove on delivery
 		simpleAction(token, data);
@@ -1521,7 +1523,7 @@ public class MqttAndroidClient extends BroadcastReceiver implements
 	 * 
 	 * @param data
 	 */
-	private void subscribeAction(Bundle data) {
+	void subscribeAction(Bundle data) {
 		IMqttToken token = removeMqttToken(data);
 		simpleAction(token, data);
 	}
@@ -1531,7 +1533,7 @@ public class MqttAndroidClient extends BroadcastReceiver implements
 	 * 
 	 * @param data
 	 */
-	private void unSubscribeAction(Bundle data) {
+	void unSubscribeAction(Bundle data) {
 		IMqttToken token = removeMqttToken(data);
 		simpleAction(token, data);
 	}
@@ -1541,7 +1543,7 @@ public class MqttAndroidClient extends BroadcastReceiver implements
 	 * 
 	 * @param data
 	 */
-	private void messageDeliveredAction(Bundle data) {
+	void messageDeliveredAction(Bundle data) {
 		IMqttToken token = removeMqttToken(data);
 		if (token != null) {
 			if (callback != null) {
@@ -1559,7 +1561,7 @@ public class MqttAndroidClient extends BroadcastReceiver implements
 	 * 
 	 * @param data
 	 */
-	private void messageArrivedAction(Bundle data) {
+	void messageArrivedAction(Bundle data) {
 		if (callback != null) {
 			String messageId = data
 					.getString(MqttServiceConstants.CALLBACK_MESSAGE_ID);
@@ -1591,7 +1593,7 @@ public class MqttAndroidClient extends BroadcastReceiver implements
 	 * 
 	 * @param data
 	 */
-	private void traceAction(Bundle data) {
+	void traceAction(Bundle data) {
 
 		if (traceCallback != null) {
 			String severity = data.getString(MqttServiceConstants.CALLBACK_TRACE_SEVERITY);
@@ -1615,7 +1617,7 @@ public class MqttAndroidClient extends BroadcastReceiver implements
 	 * @return an identifier for the token which can be passed to the Android
 	 *         Service
 	 */
-	private synchronized String storeToken(IMqttToken token) {
+	synchronized String storeToken(IMqttToken token) {
 		tokenMap.put(tokenNumber, token);
 		return Integer.toString(tokenNumber++);
 	}
@@ -1626,7 +1628,7 @@ public class MqttAndroidClient extends BroadcastReceiver implements
 	 * @param data
 	 * @return the token
 	 */
-	private synchronized IMqttToken removeMqttToken(Bundle data) {
+	synchronized IMqttToken removeMqttToken(Bundle data) {
 		
 		String activityToken = data.getString(MqttServiceConstants.CALLBACK_ACTIVITY_TOKEN);
 		if (activityToken!=null){
@@ -1644,7 +1646,7 @@ public class MqttAndroidClient extends BroadcastReceiver implements
 	 * @param data
 	 * @return the token
 	 */
-	private synchronized IMqttToken getMqttToken(Bundle data) {
+	synchronized IMqttToken getMqttToken(Bundle data) {
 		String activityToken = data
 				.getString(MqttServiceConstants.CALLBACK_ACTIVITY_TOKEN);
 		return tokenMap.get(Integer.parseInt(activityToken));
