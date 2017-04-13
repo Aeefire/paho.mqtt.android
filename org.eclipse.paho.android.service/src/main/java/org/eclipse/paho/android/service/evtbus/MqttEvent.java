@@ -9,12 +9,10 @@ import org.eclipse.paho.android.service.Status;
 public class MqttEvent {
     Object source;
     String clientHandle;
-    Status status;
 
     public MqttEvent(Object source, String clientHandle) {
         this.source = source;
         this.clientHandle = clientHandle;
-        this.status = status;
     }
 
     public Object getSource() {
@@ -25,7 +23,11 @@ public class MqttEvent {
         return clientHandle;
     }
 
-    public Status getStatus() {
-        return status;
+    @Override
+    public String toString() {
+        return getClass().getCanonicalName()+"{" +
+                "source=" + source +
+                ", clientHandle='" + clientHandle + '\'' +
+                '}';
     }
 }

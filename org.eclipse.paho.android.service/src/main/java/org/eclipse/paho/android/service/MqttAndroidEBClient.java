@@ -25,21 +25,26 @@ import org.greenrobot.eventbus.ThreadMode;
  * Created by schartmueller on 4/12/2017.
  */
 
-public class MqttAndroidEBClient extends MqttAndroidClient implements MqttCallbackExtended, MqttTraceHandler {
+public class MqttAndroidEBClient extends MqttAndroidClient {
+
     public MqttAndroidEBClient(Context context, String serverURI, String clientId) {
         super(context, serverURI, clientId);
+        MqttAndroidClient.SERVICE_NAME = "org.eclipse.paho.android.service.MqttEBService";
     }
 
     public MqttAndroidEBClient(Context ctx, String serverURI, String clientId, Ack ackType) {
         super(ctx, serverURI, clientId, ackType);
+        MqttAndroidClient.SERVICE_NAME = "org.eclipse.paho.android.service.MqttEBService";
     }
 
     public MqttAndroidEBClient(Context ctx, String serverURI, String clientId, MqttClientPersistence persistence) {
         super(ctx, serverURI, clientId, persistence);
+        MqttAndroidClient.SERVICE_NAME = "org.eclipse.paho.android.service.MqttEBService";
     }
 
     public MqttAndroidEBClient(Context context, String serverURI, String clientId, MqttClientPersistence persistence, Ack ackType) {
         super(context, serverURI, clientId, persistence, ackType);
+        MqttAndroidClient.SERVICE_NAME = "org.eclipse.paho.android.service.MqttEBService";
     }
 
     @Override
@@ -60,8 +65,8 @@ public class MqttAndroidEBClient extends MqttAndroidClient implements MqttCallba
     @Override
     void registerReceiver(BroadcastReceiver receiver) {
         MqttEventBus.getRaw().register(this);
-        super.setCallback(this);
-        super.setTraceCallback(this);
+        super.setCallback(mqttCallbackExtended);
+        super.setTraceCallback(mqttTraceHandler);
         receiverRegistered = true;
     }
 
@@ -103,40 +108,46 @@ public class MqttAndroidEBClient extends MqttAndroidClient implements MqttCallba
         }
     }
 
-    @Override
-    public void connectComplete(boolean reconnect, String serverURI) {
-        MqttEventBus.getDefault().post(new MqttConnectCompleteEvent(MqttAndroidEBClient.this, getClientHandle(), reconnect, serverURI));
-    }
+    private MqttCallbackExtended mqttCallbackExtended = new MqttCallbackExtended() {
+        @Override
+        public void connectComplete(boolean reconnect, String serverURI) {
+            MqttEventBus.getDefault().post(new MqttConnectCompleteEvent(MqttAndroidEBClient.this, getClientHandle(), reconnect, serverURI));
+        }
 
-    @Override
-    public void connectionLost(Throwable cause) {
-        MqttEventBus.getDefault().post(new MqttConnectionLostEvent(MqttAndroidEBClient.this, getClientHandle(), cause));
-    }
+        @Override
+        public void connectionLost(Throwable cause) {
+            MqttEventBus.getDefault().post(new MqttConnectionLostEvent(MqttAndroidEBClient.this, getClientHandle(), cause));
+        }
 
-    @Override
-    public void messageArrived(String topic, MqttMessage message) throws Exception {
-        MqttEventBus.getDefault().post(new MqttMessageArrivedEvent(MqttAndroidEBClient.this, getClientHandle(), topic, message));
-    }
+        @Override
+        public void messageArrived(String topic, MqttMessage message) throws Exception {
+            MqttEventBus.getDefault().post(new MqttMessageArrivedEvent(MqttAndroidEBClient.this, getClientHandle(), topic, message));
+        }
 
-    @Override
-    public void deliveryComplete(IMqttDeliveryToken token) {
-        MqttEventBus.getDefault().post(new MqttDeliveryCompleteEvent(MqttAndroidEBClient.this, getClientHandle(), token));
-    }
+        @Override
+        public void deliveryComplete(IMqttDeliveryToken token) {
+            MqttEventBus.getDefault().post(new MqttDeliveryCompleteEvent(MqttAndroidEBClient.this, getClientHandle(), token));
+        }
+    };
 
-    @Override
-    public void traceDebug(String tag, String message) {
-        MqttEventBus.getDefault().post(new MqttTraceDebugEvent(MqttAndroidEBClient.this, getClientHandle(),tag, message));
-    }
 
-    @Override
-    public void traceError(String tag, String message) {
-        MqttEventBus.getDefault().post(new MqttTraceErrorEvent(MqttAndroidEBClient.this, getClientHandle(),tag, message));
+    private MqttTraceHandler mqttTraceHandler = new MqttTraceHandler() {
+        @Override
+        public void traceDebug(String tag, String message) {
+            MqttEventBus.getDefault().post(new MqttTraceDebugEvent(MqttAndroidEBClient.this, getClientHandle(), tag, message));
+        }
 
-    }
+        @Override
+        public void traceError(String tag, String message) {
+            MqttEventBus.getDefault().post(new MqttTraceErrorEvent(MqttAndroidEBClient.this, getClientHandle(), tag, message));
 
-    @Override
-    public void traceException(String tag, String message, Exception e) {
-        MqttEventBus.getDefault().post(new MqttTraceExceptionEvent(MqttAndroidEBClient.this, getClientHandle(),tag, message, e));
+        }
 
-    }
+        @Override
+        public void traceException(String tag, String message, Exception e) {
+            MqttEventBus.getDefault().post(new MqttTraceExceptionEvent(MqttAndroidEBClient.this, getClientHandle(), tag, message, e));
+
+        }
+    };
+
 }
