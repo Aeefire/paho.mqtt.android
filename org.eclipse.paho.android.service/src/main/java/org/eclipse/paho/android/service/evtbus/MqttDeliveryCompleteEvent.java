@@ -18,4 +18,11 @@ public class MqttDeliveryCompleteEvent extends MqttEvent {
     public IMqttDeliveryToken getToken() {
         return token;
     }
+
+    @Override
+    public String toString() {
+        return "MqttDeliveryCompleteEvent{" +
+                "token=" + token +
+                "} " + super.toString();
+    }
 }

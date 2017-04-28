@@ -17,4 +17,11 @@ public class MqttConnectionLostEvent extends MqttEvent {
     public Throwable getCause() {
         return cause;
     }
+
+    @Override
+    public String toString() {
+        return "MqttConnectionLostEvent{" +
+                "cause=" + cause +
+                "} " + super.toString();
+    }
 }

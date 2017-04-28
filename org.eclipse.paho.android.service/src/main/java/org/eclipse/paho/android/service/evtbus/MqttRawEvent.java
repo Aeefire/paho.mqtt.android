@@ -11,12 +11,19 @@ import org.eclipse.paho.android.service.Status;
 public class MqttRawEvent extends MqttEvent {
     Bundle data;
 
-    public MqttRawEvent(Object source, String clientHandle, Status status, Bundle data) {
+    public MqttRawEvent(Object source, String clientHandle, Bundle data) {
         super(source, clientHandle);
         this.data = data;
     }
 
     public Bundle getData() {
         return data;
+    }
+
+    @Override
+    public String toString() {
+        return "MqttRawEvent{" +
+                "data=" + data +
+                "} " + super.toString();
     }
 }

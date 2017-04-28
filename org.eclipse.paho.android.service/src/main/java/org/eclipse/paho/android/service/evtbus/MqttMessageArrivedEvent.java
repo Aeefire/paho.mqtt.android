@@ -24,4 +24,12 @@ public class MqttMessageArrivedEvent extends MqttEvent {
     public MqttMessage getMessage() {
         return message;
     }
+
+    @Override
+    public String toString() {
+        return "MqttMessageArrivedEvent{" +
+                "topic='" + topic + '\'' +
+                ", message=" + message +
+                "} " + super.toString();
+    }
 }

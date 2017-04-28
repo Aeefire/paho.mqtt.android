@@ -218,7 +218,7 @@ public class MqttEBService extends MqttService implements MqttTraceHandler {
     @Override
     void callbackToActivity(String clientHandle, Status status,
                             Bundle dataBundle) {
-        MqttEventBus.getRaw().post(new MqttRawEvent(this, clientHandle, status, dataBundle));
+        MqttEventBus.getRaw().post(new MqttRawEvent(this, clientHandle, dataBundle));
     }
 
 }

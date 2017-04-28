@@ -22,5 +22,11 @@ public class MqttTraceEvent extends MqttEvent {
         return message;
     }
 
-
+    @Override
+    public String toString() {
+        return "MqttTraceEvent{" +
+                "tag='" + tag + '\'' +
+                ", message='" + message + '\'' +
+                "} " + super.toString();
+    }
 }

@@ -23,4 +23,12 @@ public class MqttConnectCompleteEvent extends MqttEvent {
     public String getServerURI() {
         return serverURI;
     }
+
+    @Override
+    public String toString() {
+        return "MqttConnectCompleteEvent{" +
+                "isReconnect=" + isReconnect +
+                ", serverURI='" + serverURI + '\'' +
+                "} " + super.toString();
+    }
 }
